@@ -26,32 +26,33 @@ def compress_folder(folder_path, folder_name):
 
 #Function to get authentification and upload compressed folders
 def upload_to_drive (path):
-    try:   
+    try:
         #Get credentials for the cloud
         gauth = GoogleAuth()
         # Try to load saved client credentials
-        gauth.LoadCredentialsFile(f'mycreds.txt')
+        gauth.LoadCredentialsFile(os.path.join(dir,'mycreds.txt'))
         if gauth.credentials is None:
             # Authenticate if they're not there
             gauth.LocalWebserverAuth()
         elif gauth.access_token_expired:
             # Refresh them if expired
             gauth.Refresh()
+            gauth.SaveCredentialsFile(os.path.join(dir,'mycreds.txt'))
         else:
             # Initialize the saved creds
             gauth.Authorize()
             # Save the current credentials to a file
-            gauth.SaveCredentialsFile("mycreds.txt")
+            gauth.SaveCredentialsFile(os.path.join(dir, 'mycreds.txt'))
         drive = GoogleDrive(gauth)
-        file_drive = drive.CreateFile({'title': os.path.basename(path)})    
+        file_drive = drive.CreateFile({'title': os.path.basename(path)})
         # Set content from the file
-        file_drive.SetContentFile(path)    
+        file_drive.SetContentFile(path)
         # Upload the file
         file_drive.Upload()
         write_log("INFO", f'{path} uploaded successfully!', verbose = 1)
         return True
     except Exception as e:
-        write_log("ERROR", f'Error uploading {path}: {str(e)}', verbose=1)	
+        write_log("ERROR", f'Error uploading {path}: {str(e)}', verbose=1)
         return False
 
            
@@ -70,9 +71,7 @@ def write_log(info, message, verbose):
         file.write(cout)  
 
 # Main function
-def main(directory_path, del_folder):
-    shutil.copyfile(f'{dir}/mycreds.txt', f'{directory_path}/mycreds.txt')
-    shutil.copyfile(f'{dir}/client_secrets.json', f'{directory_path}/client_secrets.json')
+def main(directory_path, del_folder):    
     today = datetime.date.today()    
     for folder_name in os.listdir(directory_path):
         try: 
@@ -95,9 +94,7 @@ def main(directory_path, del_folder):
         except:            
             write_log("ERROR", f'unable to upload {folder_name}!', verbose = 1)
             pass            
-    os.remove(f'{directory_path}/mycreds.txt')
-    os.remove(f'{directory_path}/client_secrets.json')
-        
+            
 
 # Define here the working directory (Folder with images to be saved)
 directory_path = '/home/alveslab/Img_MP'
