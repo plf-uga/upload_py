@@ -15,8 +15,8 @@ from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
 
-#Define the directory with the Google Drive credentials
-dir = '/home/alveslab/upload_py'
+#Google Drive credentials should be on the same directory as the upload.py file
+dir = os.path.dirname(os.path.abspath(__file__))
 
 # Function to compress a folder
 def compress_folder(folder_path, folder_name):
